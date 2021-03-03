@@ -46,7 +46,7 @@
             fetch("/info").then(async infoBod => {
                 const info = await infoBod.json();
                 const path = window.location.pathname.toLowerCase();
-                const filename = path.split("/")[2];
+                const filename = window.location.pathname.split("/")[2];
 
                 if (path.endsWith(".png") || path.endsWith(".webp") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif")) {
                     const fi = document.createElement("img");

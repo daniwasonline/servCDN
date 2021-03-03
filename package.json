@@ -1,6 +1,6 @@
 {
     "name": "servcdn",
-    "version": "1.1.2d",
+    "version": "1.1.2e",
     "main": "src/servcdn",
     "author": {
         "name": "Daniel Hyders",
