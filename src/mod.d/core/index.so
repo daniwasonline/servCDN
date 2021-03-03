@@ -55,8 +55,8 @@ cdn.get("/i/:imageURL", function (req, res) {
         if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
         if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
         const { birthtime } = fs.statSync(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
-        if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg")) return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "/raw/")}`.replace(`${process.config.url}/`, `${process.config.url}`), sitetitle: `${process.config.name}` });
-        else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "/raw/")}`.replace(`${process.config.url}/`, `${process.config.url}`), sitetitle: `${process.config.name}` });
+        if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg")) return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`.replace(`${process.config.url}/`, `${process.config.url}`), sitetitle: `${process.config.name}` });
+        else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`.replace(`${process.config.url}/`, `${process.config.url}`), sitetitle: `${process.config.name}` });
         else return res.redirect(`/raw/${filename}`);
     });
 });
