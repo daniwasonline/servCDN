@@ -48,7 +48,7 @@
                 const path = window.location.pathname.toLowerCase();
                 const filename = path.split("/")[2];
 
-                if (path.endsWith(".png") || path.endsWith(".webp") || path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+                if (path.endsWith(".png") || path.endsWith(".webp") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif")) {
                     const fi = document.createElement("img");
                     fi.alt = `Image was unable to load`;
                     fi.src = `../raw/${filename}`;

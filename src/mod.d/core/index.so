@@ -17,6 +17,7 @@ cdn.use(fileUpload({
         fileSize: process.config.file.sizeLimit
     }
 }));
+cdn.use(require("express-useragent").express());
 
 cdn.set("view engine", "ejs");
 
@@ -55,9 +56,11 @@ cdn.get("/i/:imageURL", function (req, res) {
         if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
         if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
         const { birthtime } = fs.statSync(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
-        if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg")) return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`.replace(`${process.config.url}/`, `${process.config.url}`), sitetitle: `${process.config.name}` });
-        else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`.replace(`${process.config.url}/`, `${process.config.url}`), sitetitle: `${process.config.name}` });
-        else return res.redirect(`/raw/${filename}`);
+        if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg") || fpath.endsWith(".gif")) return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, sitetitle: `${process.config.name}` });
+        else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) {
+            if (req.useragent.source.includes("Discord")) return res.redirect(`${process.config.url}${req.originalUrl.replace("/i/", "/raw/")}`);
+            return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}${req.originalUrl.replace("/i/", "/raw/")}`, sitetitle: `${process.config.name}` });
+        } else return res.redirect(`/raw/${filename}`);
     });
 });
 
@@ -111,7 +114,7 @@ cdn.post('/upload', async function(req, res) {
                     res.setHeader('Content-Type', 'application/json');
                     var vanity;
                     if (process.config.vanity == true) {
-                        vanity = process.config.url + '/add/vanity?filename=' + newFileName + '&key=' + key
+                        vanity = process.config.url.replace(`${process.config.url}/`, `${process.config.url}`) + '/add/vanity?filename=' + newFileName + '&key=' + key
                     } else {
                         vanity = null;
                     }
