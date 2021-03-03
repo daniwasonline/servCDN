@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * 
  * @param {string} str The string that should be outputted to stdout/console

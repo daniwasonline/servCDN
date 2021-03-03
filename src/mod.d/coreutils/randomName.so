@@ -1,4 +1,4 @@
-#!/bin/env/node
+#!/bin/env node
 
 module.exports = async function (length) {
    var result           = '';

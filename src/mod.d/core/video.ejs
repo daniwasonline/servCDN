@@ -1,6 +1,10 @@
 <html>
     <head>
         <title>servCDN</title>
+        <meta property="og:type" content="website">
+        <meta property="og:sitetitle" content="<%= sitetitle %>">
+        <meta property="og:title" content="Video requested">
+        <meta property="og:video" content="<%= url %>">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,800;1,700;1,800&display=swap');
         </style>
@@ -14,6 +18,8 @@
                 margin-right: auto;
                 border-style: solid;
                 border-color: black;
+                width: 50vw;
+                height: 35vw;
             }
             img {
                 display: block;
@@ -21,6 +27,8 @@
                 margin-right: auto;
                 border-style: solid;
                 border-color: black;
+                width: 50vw;
+                height: auto;
             }
             body {
                 background-color: #38908f;
@@ -42,7 +50,6 @@
 
                 if (path.endsWith(".png") || path.endsWith(".webp") || path.endsWith(".jpg") || path.endsWith(".jpeg")) {
                     const fi = document.createElement("img");
-                    console.log(filename);
                     fi.alt = `Image was unable to load`;
                     fi.src = `../raw/${filename}`;
                     document.getElementsByTagName("body")[0].appendChild(fi);
