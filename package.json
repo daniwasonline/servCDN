@@ -1,0 +1,16 @@
+{
+    "name": "servcdn",
+    "version": "1.0.0",
+    "main": "src/servcdn",
+    "author": {
+        "name": "Daniel Hyders",
+        "email": "git@bean.codes",
+        "url": "https://www.bean.codes"
+    },
+    "dependencies": {
+        "chalk": "^4.1.0",
+        "express": "^4.17.1",
+        "express-fileupload": "^1.2.1",
+        "js-yaml": "^4.0.0"
+    }
+}

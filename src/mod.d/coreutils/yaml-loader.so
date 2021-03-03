@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+module.exports = function () {
+    const yml = require("js-yaml");
+    const fs = require("fs");
+    const path = require("path");
+    const log = require("./log.so");
+    
+    try {
+        const doc = yml.load(fs.readFileSync(__dirname + "/../../../config.yml"));
+        return doc;
+    } catch (e) {
+        log(`config.yml failed to hook into the process`, "error");
+        return { "res": null };
+    }
+};

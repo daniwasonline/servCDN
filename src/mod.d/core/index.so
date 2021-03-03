@@ -1,0 +1,186 @@
+#!/usr/bin/env node
+const metafi = require("../../../package.json");
+const fs = require("fs");
+const path = require("path");
+const cdn = process.cdn;
+async function initLog(str) {
+    console.log(`${require("chalk").blue(`[MODULE ${require("chalk").green("INIT")}]`)} ${require("chalk").red("[CORE]")} ${str}`);
+} async function ModuleLog(str) {
+    console.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} ${str}`);
+};
+
+var fileUpload = require('express-fileupload');
+cdn.use(fileUpload({
+    safeFileNames: true,
+    preserveExtension: true,
+    limits: {
+        fileSize: process.config.file.sizeLimit
+    }
+}));
+
+cdn.get("/", function (req, res, next) {
+    res.redirect(process.config.redirectURL);
+});
+
+cdn.get("/info", function (req, res, next) {
+    res.send({ name: process.config.name, url: process.config.url })
+});
+
+cdn.get("/raw/:imageURL", function (req, res) {
+    fs.stat(path.join(__dirname + `/../../../files/${req.params.imageURL}`), (e, status) => {
+        if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
+        if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
+        res.sendFile(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
+    });
+});
+
+cdn.get("/i/:imageURL", function (req, res) {
+    fs.stat(path.join(__dirname + `/../../../files/${req.params.imageURL}`), (e, status) => {
+        if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
+        if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
+        res.sendFile(__dirname + "/index.html");
+    });
+});
+
+cdn.listen(3000, async function () {
+    initLog(`servCDN Core (part of servCDN v${process.package.version}) was loaded successfully`);
+});
+
+cdn.post('/upload', async function(req, res) {
+    if(!req.query.key) {
+        res.setHeader('Content-Type', 'application/json');
+        res.status(400).send(JSON.stringify({
+            success: false,
+            error: {
+                message: 'The key is empty',
+                fix: 'Try redoing this request with a valid key'
+            }
+        }));
+    } else {
+        var key = req.query.key;
+        var shortKey = key.substr(0, 3) + '...';
+        if(process.config.keys.indexOf(key) == -1) {
+            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} User failed authentication (${key})`, "info")
+            res.setHeader('Content-Type', 'application/json');
+            res.status(401).send(JSON.stringify({
+                success: false,
+                error: {
+                    message: 'The key is invalid',
+                    fix: "Try using a key that's valid"
+                }
+            }));
+        } else {
+            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} User successfully authenticated (${shortKey})`, "info")
+            if(!req.files.file) {
+            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Upload to servCDN failed`, "info")
+                res.setHeader('Content-Type', 'application/json');
+                res.status(400).send(JSON.stringify({
+                    success: false,
+                    error: {
+                        message: 'No file was provided',
+                        fix: 'Upload a file to be hosted'
+                    }
+                }));
+            } else {
+                var file = req.files.file;
+                var fileExtension = path.extname(file.name);
+                var newFileName = await process.random(process.config.file.nameLength) + fileExtension;
+                var uploadPath = __dirname + '../../../../files/' + newFileName;
+                process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Uploading ${file.name} as ${newFileName} to servCDN (${shortKey})`, "info")
+                file.mv(uploadPath, function(err) {
+                    if(err) {
+                        process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} ${err}`, "error")
+                    }
+
+                process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Uploaded ${file.name} as ${newFileName} to servCDN (${shortKey})`, "info")
+                    res.setHeader('Content-Type', 'application/json');
+                    var vanity;
+                    if (process.config.vanity == true) {
+                        vanity = process.config.url + '/add/vanity?filename=' + newFileName + '&key=' + key
+                    } else {
+                        vanity = null;
+                    }
+                    res.send(JSON.stringify({
+                        success: true,
+                        file: {
+                            url: process.config.url + '/i/' + newFileName,
+                            vanity_url: vanity,
+                            delete_url: process.config.url + '/delete?filename=' + newFileName + '&key=' + key
+                    }
+                }));
+            });
+        }
+    }};
+});
+
+cdn.get('/delete', function(req, res) {
+    if(!req.query.filename || !req.query.key) {
+        res.setHeader('Content-Type', 'application/json');
+        res.status(400).send(JSON.stringify({
+            success: false,
+            error: {
+                message: 'The key/filename is empty',
+                fix: 'Try redoing this request with a valid key and filename'
+            }
+        }));
+    } else {
+        var key = req.query.key;
+        var shortKey = key.substr(0, 3) + '...';
+        if(process.config.keys.indexOf(key) == -1) {
+            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} User failed authentication (${key})`, "info")
+            res.setHeader('Content-Type', 'application/json');
+            res.status(401).send(JSON.stringify({
+                success: false,
+                error: {
+                    message: 'The key is invalid',
+                    fix: "Try using a key that's valid"
+                }
+            }));
+        } else {
+            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} User successfully authenticated (${shortKey})`, "info")
+
+            var fileName = req.query.filename;
+            var filePath = path.join(__dirname + '../../../../files/' + fileName);
+
+            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Attempting to delete ${fileName} (${shortKey})`, "info")
+
+
+            fs.stat(filePath, (err, status) => {
+                if(err) {
+                    process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Failed to delete ${fileName} (${shortKey})`, "error");
+                    process.log(err, "error");
+                    return res.status(500).send(err);
+                }
+
+                if(!status) {
+                    process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} ${filename} doesn't exist, aborting.. (${shortKey})`, "info");
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(400).send(JSON.stringify({
+                        success: false,
+                        error: {
+                            message: "404 (File doesn't exist)",
+                            fix: "Try deleting a file that actually exists"
+                        }
+                    }));
+                } else {
+
+                    fs.unlink(filePath, function(err) {
+                        if(err) {
+                            process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Failed to delete ${fileName} (${shortKey})`, "error");
+                            process.log(err, "error");
+                            return res.status(500).send(err);
+                        }
+
+                        process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Successfully deleted ${fileName} (${shortKey})`, "info");
+
+                        res.setHeader('Content-Type', 'application/json');
+                        res.send(JSON.stringify({
+                            success: true,
+                            message: `Deleted ${fileName} successfully`
+                        }));
+                    });
+                }
+            });
+        }
+    }
+});

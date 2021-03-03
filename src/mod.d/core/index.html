@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>servCDN</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,800;1,700;1,800&display=swap');
+        </style>
+    </head>
+    <body>
+        <style>
+            video {
+                display: block;
+                margin-top: 30px;
+                margin-left: auto;
+                margin-right: auto;
+                border-style: solid;
+                border-color: black;
+            }
+            img {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                border-style: solid;
+                border-color: black;
+            }
+            body {
+                background-color: #38908f;
+            }
+            h2 {
+                text-align: center;
+                font-family: 'Open Sans', sans-serif;
+                color: white;
+            }
+            a {
+                color: white;
+            }
+        </style>
+        <script>
+            fetch("/info").then(async infoBod => {
+                const info = await infoBod.json();
+                const path = window.location.pathname.toLowerCase();
+                const filename = path.split("/")[2];
+
+                if (path.endsWith(".png") || path.endsWith(".webp") || path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+                    const fi = document.createElement("img");
+                    console.log(filename);
+                    fi.alt = `Image was unable to load`;
+                    fi.src = `../raw/${filename}`;
+                    document.getElementsByTagName("body")[0].appendChild(fi);
+                } else if (path.endsWith(".mp4") || path.endsWith(".webm")) {
+                    const fi = document.createElement("video");
+                    fi.controls = true;
+                    fi.src = `../raw/${filename}`;
+                    fi.alt = "Video was unable to load";
+                    fi.autoplay = true;
+                    fi.load();
+                    document.getElementsByTagName("body")[0].appendChild(fi);
+                } else {
+                    window.location.href = `../raw/${filename}`;
+                };
+                const name = document.createElement("h2");
+                document.title = info.name;
+                name.innerHTML = `File hosted on <a href="/">${info.url.replace("https://", "").replace("http://", "")}</a>`;
+                document.getElementsByTagName("body")[0].appendChild(name);
+            });
+        </script>
+    </body>
+</html>

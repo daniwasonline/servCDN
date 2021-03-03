@@ -1,0 +1,45 @@
+/**
+ * 
+ * @param {string} str The string that should be outputted to stdout/console
+ * @param {string} type The type of log to output
+ */
+const chalk = require("chalk");
+const types = [
+    "warn",
+    "info",
+    "error",
+    "init",
+    "log"
+];
+
+module.exports = function (str, type) {
+    function incorrectError(obj, typeOfObj) {
+        if (!obj) return new TypeError(`Argument obj expected typeOfObj; Type passed: ${typeof obj}`);
+        if (typeof typeOfObj !== "string") return new TypeError(`Argument typeOfObj expected string; Type passed: ${typeof obj}`);
+        return `Argument ${obj} expected ${typeOfObj}; Type passed: ${typeof obj}`;
+    };
+    if (typeof str !== "string") return new TypeError(incorrectError(str, "string"));
+    if (!types.includes(type) && type) return new Error("Argument type invalid!");
+
+    switch (type) {
+        case "warn":
+            console.log(chalk.yellow(`[WARN] ${str}`));
+            break;
+        case "info":
+            console.log(chalk.cyanBright(`[INFO] ${str}`));
+            break;
+        case "error":
+            console.log(chalk.red(`[ERROR] ${str}`));
+            break;
+        case "init":
+            console.log(chalk.green(`[INIT] ${str}`));
+            break;
+        case "log":
+            console.log(`[LOG] ${str}`);
+            break;
+        default:
+            console.log(`[LOG] ${str}`);
+    };
+    
+    return;
+};

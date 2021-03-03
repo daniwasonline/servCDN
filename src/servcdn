@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+console.log(`V8: Node Runtime ${process.version} (${process.arch})`);
+console.log("Loading modules and libraries...");
+
+const log = require("./mod.d/coreutils/log.so");
+const fs = require("fs");
+const express = require("express");
+const cdn = express();
+const path = require("path");
+
+console.log("Attaching coremods to servCDN..");
+process.log = require("./mod.d/coreutils/log.so");
+process.cdn = cdn;
+process.package = require("../package.json");
+process.config = require("./mod.d/coreutils/yaml-loader.so")();
+process.random = require("./mod.d/coreutils/randomName.so");
+
+const modDirs = fs.readdirSync(path.join(__dirname + "/mod.d"), { withFileTypes: true }).filter(subcat => subcat.isDirectory());
+var modLength = 0;
+
+if (modDirs.length == 0) {
+    return log(`No modules were detected, closing process..`, "init")
+} if (modDirs.length == 1) {
+    log(`${modDirs.length} module was loaded into the process.`, "init");
+} if (modDirs.length !== 1) {
+    log(`${modDirs.length} modules were loaded into the process.`, "init");
+};
+
+for (const modDirObj of modDirs) {
+    const modDir = modDirObj.name;
+    modLength++;
+    const modEach = fs.readdirSync(path.join(__dirname, `/mod.d/${modDir}`)).filter(ent => ent.endsWith("index.so"));
+    for (const modFiObj of modEach) {
+        try {
+            require("util").promisify(setTimeout)(1000).then(f => {
+                require(`./mod.d/${modDir}/${modFiObj}`);
+            });
+        } catch (e) {
+            log(`${require("chalk").blue("[MODULE]")} failed to load index.so in module ${modDir} (${modLength} / ${modDirs.length})`, "error");
+            log(`${e}`, "error");
+        };
+    };
+    log(`${require("chalk").blue("[MODULE]")} ${modDir} loaded (${modLength} / ${modDirs.length})`, "init");
+};
+log(`Modules registered, executing..`, "init");
