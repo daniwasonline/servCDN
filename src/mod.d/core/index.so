@@ -103,7 +103,7 @@ cdn.post('/upload', async function(req, res) {
                 var file = req.files.file;
                 var fileExtension = path.extname(file.name);
                 var newFileName = await process.random(process.config.file.nameLength) + fileExtension;
-                var uploadPath = __dirname + '/../../../../files/' + newFileName;
+                var uploadPath = __dirname + '/../../../files/' + newFileName;
                 process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Uploading ${file.name} as ${newFileName} to servCDN (${shortKey})`, "info")
                 file.mv(uploadPath, function(err) {
                     if(err) {
@@ -158,7 +158,7 @@ cdn.get('/delete', function(req, res) {
             process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} User successfully authenticated (${shortKey})`, "info")
 
             var fileName = req.query.filename;
-            var filePath = path.join(__dirname + '/../../../../files/' + fileName);
+            var filePath = path.join(__dirname + '/../../../files/' + fileName);
 
             process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Attempting to delete ${fileName} (${shortKey})`, "info")
 
