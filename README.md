@@ -5,6 +5,30 @@ servCDN is a ShareX webserver implemented in JavaScript designed to upload and s
 
 (note: I've used some code from [ravi0lii's ShareX server](https://github.com/ravi0lii/node-sharex-server) for the upload and deletion (as well as the vanity module, which is a copy of the upload function but optimised for transfers). They are adequate enough for use in servCDN, but I've made a few changes for compatibility, security, and some other general changes. I also used some code from Stack Overflow for the random file names.)
 
+### Sample configuration
+Save this as an **sxcu** file and run it with ShareX.
+```sxcu
+{
+  "Version": "13.2.1",
+  "Name": "servCDN",
+  "DestinationType": "ImageUploader, TextUploader, FileUploader",
+  "RequestMethod": "POST",
+  "RequestURL": "https://yourdomain.here/upload",
+  "Parameters": {
+    "key": "yourkey.here"
+  },
+  "Body": "MultipartFormData",
+  "Arguments": {
+    "key": "yourkey.here"
+  },
+  "FileFormName": "file",
+  "URL": "$json:file.url$",
+  "ThumbnailURL": "$json:file.vanity_url$",
+  "DeletionURL": "$json:file.delete_url$"
+}
+```
+
+
 ### SSL support
 If anyone wants to PR SSL support, feel free to. I usually use a reverse-proxy on my dedi with Apache to provide HTTPS support for my CDN, so I won't be implementing this myself.
 
