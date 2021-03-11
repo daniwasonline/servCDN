@@ -203,6 +203,6 @@ cdn.get('/delete', function(req, res) {
     }
 });
 
-cdn.listen(3000, async function () {
+cdn.listen(process.config.port, async function () {
     initLog(`servCDN Core (part of servCDN v${process.package.version}) was started successfully`);
 });
