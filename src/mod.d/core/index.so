@@ -60,7 +60,7 @@ cdn.get("/i/:imageURL", function (req, res) {
         else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) {
             if (req.useragent.source.includes("Discord")) return res.sendFile(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
             return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}${req.originalUrl.replace("/i/", "/raw/")}`, sitetitle: `${process.config.name}` });
-        } else return res.redirect(`/raw/${filename}`);
+        } else return res.redirect(`/raw/${req.params.imageURL}`);
     });
 });
 
