@@ -103,6 +103,7 @@ cdn.post('/upload', async function(req, res) {
                 var file = req.files.file;
                 var fileExtension = path.extname(file.name);
                 var newFileName = await process.random(process.config.file.nameLength) + fileExtension;
+                if (req.query.img == "true" || req.query.img == true) newFileName = await process.random(process.config.file.nameLength) + ".png";
                 var uploadPath = __dirname + '/../../../files/' + newFileName;
                 process.log(`${require("chalk").blue("[MODULE]")} ${require("chalk").red("[CORE]")} Uploading ${file.name} as ${newFileName} to servCDN (${shortKey})`, "info")
                 file.mv(uploadPath, function(err) {
