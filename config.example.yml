@@ -1,7 +1,8 @@
 # Name this to config.yml
 url: "https://example.com" # The servCDN instance url
 redirectURL: https://example.com # The page that [yourdomain]/ should go to; example: cdn.bean.codes/ goes to www.bean.codes if redirectURL is set to "https://www.bean.codes/"
-port: 3000
+port: 3000 # The port that servCDN will listen to
+listener: 0.0.0.0 # The address that belongs to the interface on which you want to listen to (0.0.0.0 listens to all). Unless if you are using a weird server networking configuration, or if you only want it to listen on a certain interface, then you shouldn't change this.
 file: { sizeLimit: 1073741824, nameLength: 14 } # Size limit is the max file size in bytes, name length is for generated name length
 keys: ["poggers"] # Authorisation keys
 name: "Example User's CDN" # The name that you want to put into the CDN
