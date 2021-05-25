@@ -2,12 +2,13 @@
     <head>
         <title>servCDN</title>
         <meta property="og:type" content="article">
-        <meta property="og:site_name" content="<%= sitetitle %>">
-        <meta property="og:title" content="Video requested">
+        <meta property="og:site_name" content="<%- customisation.name  %>">
+        <meta property="og:title" content="Video created at <%= fileMade %>">
         <meta property="og:video" content="<%= url %>">
         <meta name="twitter:card" content="summary_large_image">
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+        <meta name="theme-color" content="<%= customisation.colour %>">
+        <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     </head>
     <body>
         <style>
@@ -31,11 +32,11 @@
                 height: auto;
             }
             body {
-                background-color: #38908f;
+                background-color: #1c77c3;
             }
             h2 {
                 text-align: center;
-                font-family: 'Open Sans', sans-serif;
+                font-family: 'Red Hat Display', sans-serif;
                 color: white;
             }
             a {
@@ -65,7 +66,8 @@
                     window.location.href = `../raw/${filename}`;
                 };
                 const name = document.createElement("h2");
-                document.title = info.name;
+                document.title = info.customisation.name;
+                document.getElementsByTagName("body")[0].style.backgroundColor = info.customisation.colour;
                 name.innerHTML = `File hosted on <a href="/">${info.url.replace("https://", "").replace("http://", "")}</a>`;
                 document.getElementsByTagName("body")[0].appendChild(name);
             });

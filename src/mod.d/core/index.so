@@ -26,8 +26,9 @@ cdn.get("/", function (req, res, next) {
 });
 
 cdn.get("/info", function (req, res, next) {
-    res.send({ name: process.config.name, url: process.config.url })
+    res.send({ customisation: process.config.customisation, url: process.config.url })
 });
+
 cdn.get("/robots.txt", function (req, res, next) {
     res.sendFile(path.join(__dirname + "/robots.txt"));
 });
@@ -46,20 +47,20 @@ cdn.get("/created/:imageURL", function (req, res) {
         if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
         if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
         const { birthtime } = fs.statSync(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
-        return res.status(200).send(`${birthtime}`);
+        return res.status(200).send({ unix: birthtime.valueOf(), friendly: birthtime.toUTCString(), iso: birthtime.toISOString() });
     });
 });
 
-cdn.get("/i/:imageURL", function (req, res) {
+cdn.get("/i/:imageURL", async function (req, res) {
     const fpath = req.originalUrl;
     fs.stat(path.join(__dirname + `/../../../files/${req.params.imageURL}`), (e, status) => {
         if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
         if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
         const { birthtime } = fs.statSync(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
-        if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg") || fpath.endsWith(".gif")) return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, sitetitle: `${process.config.name}` });
-        else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) {
-            if (req.useragent.source.includes("Discord")) return res.sendFile(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
-            return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}${req.originalUrl.replace("/i/", "/raw/")}`, sitetitle: `${process.config.name}` });
+        if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg") || fpath.endsWith(".gif")) {
+            return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: `${birthtime.toLocaleDateString("default", { dateStyle: "medium" })} @ ${birthtime.toLocaleTimeString("default", { timeZone: "Europe/London", hour12: true, timeStyle: "short" })} GMT` });
+        } else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) {
+            return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: `${birthtime.toLocaleDateString("default", { dateStyle: "medium" })} @ ${birthtime.toLocaleTimeString("default", { timeZone: "Europe/London", hour12: true, timeStyle: "short" })} GMT` });
         } else return res.redirect(`/raw/${req.params.imageURL}`);
     });
 });
