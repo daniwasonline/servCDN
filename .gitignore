@@ -3,3 +3,4 @@ config.yml
 package-lock.json
 src/mod.d/dannington/
 files/
+yarn.lock
