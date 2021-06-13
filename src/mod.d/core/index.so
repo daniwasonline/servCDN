@@ -3,6 +3,7 @@ const metafi = require("../../../package.json");
 const fs = require("fs");
 const path = require("path");
 const cdn = process.cdn;
+const { DateTime } = require("luxon");
 async function initLog(str) {
     console.log(`${require("chalk").blue(`[MODULE ${require("chalk").green("INIT")}]`)} ${require("chalk").red("[CORE]")} ${str}`);
 } async function ModuleLog(str) {
@@ -37,7 +38,6 @@ cdn.get("/raw/:imageURL", function (req, res) {
     fs.stat(path.join(__dirname + `/../../../files/${req.params.imageURL}`), (e, status) => {
         if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
         if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
-        const { birthtime } = fs.statSync(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
         return res.sendFile(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
     });
 });
@@ -57,10 +57,14 @@ cdn.get("/i/:imageURL", async function (req, res) {
         if (!status) return res.status(404).send("<p style='font-family: monospace;'>servCDN couldn't find the file that you were looking for. Apologies!</p>");
         if (e !== null) return res.status(500).send("<p style='font-family: monospace;'>servCDN is currently experiencing issues with finding that file (it is unknown if the file even exists). Sorry about that.</p>");
         const { birthtime } = fs.statSync(path.join(__dirname + `/../../../files/${req.params.imageURL}`));
+        const btdLuxon = DateTime.fromJSDate(birthtime);
+        const TimeLocale = DateTime.TIME_SIMPLE;
+        TimeLocale.timeZone = "UTC";
+        const btdStr = `${btdLuxon.toLocaleString(TimeLocale)} on ${btdLuxon.toLocaleString({ locale: "en-gb", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })} (GMT)`;
         if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg") || fpath.endsWith(".gif")) {
-            return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: `${birthtime.toLocaleDateString("default", { dateStyle: "medium" })} @ ${birthtime.toLocaleTimeString("default", { timeZone: "Europe/London", hour12: true, timeStyle: "short" })} GMT` });
+            return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: btdStr });
         } else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) {
-            return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: `${birthtime.toLocaleDateString("default", { dateStyle: "medium" })} @ ${birthtime.toLocaleTimeString("default", { timeZone: "Europe/London", hour12: true, timeStyle: "short" })} GMT` });
+            return res.render(path.join(__dirname + "/video.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: btdStr });
         } else return res.redirect(`/raw/${req.params.imageURL}`);
     });
 });
