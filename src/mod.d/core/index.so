@@ -60,7 +60,7 @@ cdn.get("/i/:imageURL", async function (req, res) {
         const btdLuxon = DateTime.fromJSDate(birthtime);
         const TimeLocale = DateTime.TIME_SIMPLE;
         TimeLocale.timeZone = "UTC";
-        const btdStr = `${btdLuxon.toLocaleString(TimeLocale)} on ${btdLuxon.toLocaleString({ locale: "en-gb", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })} (GMT)`;
+        const btdStr = `${btdLuxon.toLocaleString(TimeLocale)} on ${btdLuxon.toLocaleString({ locale: "en-gb", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })} (GMT)`;
         if (fpath.endsWith(".png") || fpath.endsWith(".webp") || fpath.endsWith(".jpg") || fpath.endsWith(".jpeg") || fpath.endsWith(".gif")) {
             return res.render(path.join(__dirname + "/photo.ejs"), { url: `${process.config.url}/${req.originalUrl.replace("/i/", "raw/")}`, customisation: process.config.customisation, fileMade: btdStr });
         } else if (fpath.endsWith(".mp4") || fpath.endsWith(".webm")) {
